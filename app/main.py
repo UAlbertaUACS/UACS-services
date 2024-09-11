@@ -5,12 +5,12 @@ from fastapi import FastAPI, Request, Response
 from app.config import settings
 from app.routers.lockers import lockers_router
 from app.routers.orders import orders_router
+from app.routers.general import general_router
 import firebase_admin
 import pathlib
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from app.utils.db import lifespan
-import os
 
 basedir = pathlib.Path(__file__).parents[1]
 load_dotenv(basedir / ".env")
@@ -19,7 +19,7 @@ app = FastAPI(
     title="Backend UACS",
     description="",
     version="1.0.0",
-    docs_url="/",
+    docs_url="/docs",
     root_path=settings.root_path,
     lifespan=lifespan,
 )
@@ -36,6 +36,8 @@ app.add_middleware(
 
 app.include_router(lockers_router.router, prefix="/lockers")
 app.include_router(orders_router.router, prefix="/orders")
+app.include_router(general_router.router, prefix="/v1")
+
 firebase_admin.initialize_app()
 
 if __name__ == "__main__":
