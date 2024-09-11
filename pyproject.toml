@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "backend-uacs"
+version = "0.1.0"
+description = ""
+authors = ["mansooranis <mansooranis60@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.114.0"
+uvicorn = {extras = ["standard"], version = "^0.30.6"}
+motor = "^3.5.1"
+pydantic-settings = "^2.4.0"
+firebase-admin = "^6.5.0"
+email-validator = "^2.2.0"
+fastapi-mail = "^1.4.1"
+google-api-python-client = "^2.145.0"
+google-auth-httplib2 = "^0.2.0"
+google-auth-oauthlib = "^1.2.1"
+mailtrap = "^2.0.1"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.6.4"
+black = "^24.8.0"
+mypy = "^1.11.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
