@@ -8,7 +8,8 @@ from app import main
 from app.models.Order.methods import get_all_orders, approve_order, reject_order, get_all_pending_orders
 from app.routers import check_admin_access
 from app.mail import send_email
-from app.utils.utils import create_approved_locker_email 
+from app.utils.utils import create_approved_locker_email, create_rejected_locker_email
+from fastapi.requests import Request 
 
 router = APIRouter()
 
@@ -32,7 +33,6 @@ async def get_all_pending_orders_route(user: dict = Depends(get_firebase_user_fr
     if error:
         raise error
     orders = await get_all_pending_orders()
-    print(orders)
     return {"orders": orders}
 
 @router.post("/approve-order")
@@ -51,14 +51,24 @@ async def approve_order_route(order_id: str, user: dict = Depends(get_firebase_u
     return order_approved_email
 
 @router.post("/reject-order")
-async def reject_order_route(order_id: str, user: dict = Depends(get_firebase_user_from_token)):
+async def reject_order_route(order_id: str, email:bool, request: Request, user: dict = Depends(get_firebase_user_from_token)):
     """
     Reject an order
     """
     error = await check_admin_access(user)
     if error:
         raise error
-    return await reject_order(order_id, user)
+    order_rejected_email = await reject_order(order_id, user)
+    if not order_rejected_email:
+        # Bad request
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Order invalid")
+    if email:
+        body = await request.json()
+        note = body["note"]
+        if not note:
+            note = "No reason provided. Contact execs@uacs.ca"
+        send_email(create_rejected_locker_email(name=user["name"], notes=note), order_rejected_email, "CSC Locker Rental", "Lockers")
+    return True
 
 @router.get("/get-my-orders")
 async def get_my_orders(user: dict = Depends(get_firebase_user_from_token)):

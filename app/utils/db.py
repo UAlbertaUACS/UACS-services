@@ -14,7 +14,7 @@ async def lifespan(app: FastAPI):
 async def startup_db_client(app):
     app.mongodb_client = AsyncIOMotorClient(
         settings.mongo_uri)
-    app.mongodb = app.mongodb_client.get_database("production")
+    app.mongodb = app.mongodb_client.get_database(settings.database_name)
     print("MongoDB connected.")
 
 async def shutdown_db_client(app):

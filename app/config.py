@@ -1,5 +1,5 @@
 import os
-from typing import Annotated
+from typing import Annotated, List
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from dotenv import load_dotenv
 import pathlib
@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     env: str = os.getenv("ENV", "dev")
     logging_level: str = "INFO"
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
-    frontend_url: str = os.getenv("FRONTEND_URL", "NA")
+    frontend_urls: List[str] = os.getenv("FRONTEND_URLS", ["*"])
+    database_name: str = os.getenv("DATABASE_NAME", "production")
 
 settings = Settings()

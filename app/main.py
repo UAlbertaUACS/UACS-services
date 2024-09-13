@@ -23,8 +23,7 @@ app = FastAPI(
     root_path=settings.root_path,
     lifespan=lifespan,
 )
-
-origins = [settings.frontend_url]
+origins = settings.frontend_urls
 # print(f"Allowed origins: {origins}")
 app.add_middleware(
     CORSMiddleware,

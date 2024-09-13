@@ -43,7 +43,6 @@ async def approve_order(order_id: str, reviewer_email:str) -> bool:
     order["reviewer_email"] = reviewer_email
     locker = await main.app.mongodb["lockers"].find_one({"lockerNumber": order["locker_id"]})
     if locker is None:
-        print("order is none")
         return False, False
     locker["ownerEmail"] = order["user_email"]
     locker["expiryDate"] = order["expiry"]
@@ -66,4 +65,4 @@ async def reject_order(order_id: str, reviewer_email: str) -> bool:
     order["status"] = "rejected"
     order["reviewer_email"] = reviewer_email
     await main.app.mongodb["orders"].update_one({"id": order_id}, {"$set": order})
-    return True
+    return order["user_email"]
