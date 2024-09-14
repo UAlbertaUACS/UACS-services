@@ -5,7 +5,6 @@ from app.models.Order import Order
 from app.models.Order.methods import create_order
 from app.routers import check_admin_access
 from app import main
-# import uuid
 import uuid
 
 router = APIRouter()
@@ -81,3 +80,20 @@ async def get_all_lockers(user: dict = Depends(get_firebase_user_from_token)):
     lockers  = await main.app.mongodb["lockers"].find({}, {"_id": 0}).to_list(length=None)
 
     return {"lockers": lockers}
+
+@router.post("/renew-locker")
+async def renew_locker(requests: Request, locker_number:int, user: dict = Depends(get_firebase_user_from_token)):
+    """
+    Renew a locker
+    """
+    body = await requests.json()
+    if not body["expiry"] or not body["year"] or not body["transaction_id"]:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing parameters")
+    locker = await main.app.mongodb["lockers"].find_one({"lockerNumber": locker_number, "ownerEmail": user["email"]})
+    if locker is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Locker not found")
+    
+    order = Order(id=str(uuid.uuid4()),type="locker",locker_id=locker_number, user_email=user["email"], expiry=body["expiry"], year=body["year"], status="pending", transaction_id=body["transaction_id"])
+    return await create_order(order)
+    
+    
