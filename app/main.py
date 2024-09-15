@@ -19,7 +19,7 @@ app = FastAPI(
     title="Backend UACS",
     description="",
     version="1.0.0",
-    docs_url="/docs",
+    docs_url=None,
     root_path=settings.root_path,
     lifespan=lifespan,
 )
